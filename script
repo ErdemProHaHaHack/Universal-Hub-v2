@@ -1,0 +1,227 @@
+--[[ 
+    ULTIMATE OWNER PANEL (MOBILE SUPPORTED)
+    Sadece oyun sahibi için otomatik yetkilendirme.
+    Sürüklenebilir, Mobil Uyumlu ve Çok Fonksiyonlu.
+--]]
+
+local Player = game.Players.LocalPlayer
+local Mouse = Player:GetMouse()
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+
+-- Sahiplik Kontrolü
+if game.CreatorId ~= Player.UserId then 
+	print("Yetkiniz yok!")
+	script:Destroy() 
+	return 
+end
+
+-- GUI ANA YAPI
+local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
+ScreenGui.Name = "UltimateOwnerPanel"
+ScreenGui.ResetOnSpawn = false
+
+-- AÇ/KAPAT BUTONU (Mobil için şart)
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
+ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
+ToggleBtn.Text = "PANEL"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
+ToggleBtn.BorderSizePixel = 2
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.TextSize = 14
+
+-- ANA PANEL
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 250, 0, 350)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.Visible = true
+Frame.Active = true
+Frame.Draggable = true -- Sürüklenebilir özellik
+
+-- Köşeleri Yuvarla
+local Corner = Instance.new("UICorner", Frame)
+Corner.CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "OWNER PANEL v2 (Ultra)"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 18
+local TitleCorner = Instance.new("UICorner", Title)
+
+-- SCROLLING FRAME (Çok fazla buton sığması için)
+local Scroll = Instance.new("ScrollingFrame", Frame)
+Scroll.Size = UDim2.new(1, -20, 1, -60)
+Scroll.Position = UDim2.new(0, 10, 0, 50)
+Scroll.BackgroundTransparency = 1
+Scroll.CanvasSize = UDim2.new(0, 0, 2, 0) -- İçerik uzadıkça kaydırılabilir
+Scroll.ScrollBarThickness = 5
+
+local Layout = Instance.new("UIListLayout", Scroll)
+Layout.Padding = UDim.new(0, 5)
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- BUTON OLUŞTURMA FONKSİYONU
+local function createBtn(text, color, callback)
+	local btn = Instance.new("TextButton", Scroll)
+	btn.Size = UDim2.new(0.9, 0, 0, 35)
+	btn.Text = text
+	btn.BackgroundColor3 = color
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 16
+	local bCorner = Instance.new("UICorner", btn)
+	bCorner.CornerRadius = UDim.new(0, 6)
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end
+
+-- ==========================================
+-- FONKSİYONLAR VE ÖZELLİKLER
+-- ==========================================
+
+-- 1. HIZ
+createBtn("Hız: 100", Color3.fromRGB(0, 120, 215), function()
+	Player.Character.Humanoid.WalkSpeed = 100
+end)
+
+-- 2. ZIPLAMA
+createBtn("Süper Zıplama", Color3.fromRGB(0, 150, 0), function()
+	Player.Character.Humanoid.JumpPower = 150
+end)
+
+-- 3. RESET
+createBtn("Sıfırla (Hız/Zıplama)", Color3.fromRGB(150, 0, 0), function()
+	Player.Character.Humanoid.WalkSpeed = 16
+	Player.Character.Humanoid.JumpPower = 50
+end)
+
+-- 4. INFINITE JUMP (Sınırsız Zıplama)
+local InfJump = false
+createBtn("Sınırsız Zıplama: KAPALI", Color3.fromRGB(80, 80, 80), function(self)
+	InfJump = not InfJump
+	-- Buton textini güncellemek için local referans gerekir, bu yüzden fonksiyon içinde yapıyoruz
+	-- Not: Basitlik için butonu tekrar oluşturmak yerine text değiştiriyoruz
+end)
+-- Butonun textini güncellemek için yukarıdaki fonksiyonu biraz modifiye edelim:
+local jumpBtn = createBtn("Sınırsız Zıplama: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+jumpBtn.MouseButton1Click:Connect(function()
+	InfJump = not InfJump
+	jumpBtn.Text = InfJump and "Sınırsız Zıplama: AÇIK" or "Sınırsız Zıplama: KAPALI"
+	jumpBtn.BackgroundColor3 = InfJump and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
+end)
+
+UserInputService.JumpRequest:Connect(function()
+	if InfJump then
+		Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+	end
+end)
+
+-- 5. NOCLIP (Duvar Geçme)
+local Noclip = false
+local noclipBtn = createBtn("Noclip: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+noclipBtn.MouseButton1Click:Connect(function()
+	Noclip = not Noclip
+	noclipBtn.Text = Noclip and "Noclip: AÇIK" or "Noclip: KAPALI"
+	noclipBtn.BackgroundColor3 = Noclip and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
+end)
+
+RunService.Stepped:Connect(function()
+	if Noclip then
+		for _, part in pairs(Player.Character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	end
+end)
+
+-- 6. FULLBRIGHT (Aydınlatma)
+local Bright = false
+local brightBtn = createBtn("Gece Görüşü: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+brightBtn.MouseButton1Click:Connect(function()
+	Bright = not Bright
+	brightBtn.Text = Bright and "Gece Görüşü: AÇIK" or "Gece Görüşü: KAPALI"
+	if Bright then
+		Lighting.Brightness = 2
+		Lighting.ClockTime = 14
+		Lighting.GlobalShadows = false
+	else
+		Lighting.Brightness = 1
+		Lighting.GlobalShadows = true
+	end
+end)
+
+-- 7. FOV CHANGER (Görüş Açısı)
+createBtn("Geniş Görüş (FOV)", Color3.fromRGB(120, 0, 120), function()
+	game.Workspace.CurrentCamera.FieldOfView = 110
+end)
+
+createBtn("Normal Görüş (FOV)", Color3.fromRGB(100, 100, 100), function()
+	game.Workspace.CurrentCamera.FieldOfView = 70
+end)
+
+-- 8. ESP (Oyuncuları İşaretle)
+local ESP = false
+local espBtn = createBtn("ESP: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+espBtn.MouseButton1Click:Connect(function()
+	ESP = not ESP
+	espBtn.Text = ESP and "ESP: AÇIK" or "ESP: KAPALI"
+	if not ESP then
+		for _, p in pairs(game.Players:GetPlayers()) do
+			if p.Character and p.Character:FindFirstChild("Highlight") then
+				p.Character.Highlight:Destroy()
+			end
+		end
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if ESP then
+		for _, p in pairs(game.Players:GetPlayers()) do
+			if p ~= Player and p.Character then
+				if not p.Character:FindFirstChild("Highlight") then
+					local hl = Instance.new("Highlight", p.Character)
+					hl.FillColor = Color3.new(1, 0, 0)
+					hl.OutlineColor = Color3.new(1, 1, 1)
+				end
+			end
+		end
+	end
+end)
+
+-- 9. LOCAL GOD MODE (Yerel Ölümsüzlük)
+local God = false
+local godBtn = createBtn("God Mode: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+godBtn.MouseButton1Click:Connect(function()
+	God = not God
+	godBtn.Text = God and "God Mode: AÇIK" or "God Mode: KAPALI"
+	if God then
+		Player.Character.Humanoid.MaxHealth = math.huge
+		Player.Character.Humanoid.Health = math.huge
+	else
+		Player.Character.Humanoid.MaxHealth = 100
+		Player.Character.Humanoid.Health = 100
+	end
+end)
+
+-- PANEL AÇ/KAPAT SİSTEMİ
+ToggleBtn.MouseButton1Click:Connect(function()
+	Frame.Visible = not Frame.Visible
+end)
+
+-- Klavye 'L' tuşu desteği (PC için kalsın)
+UserInputService.InputBegan:Connect(function(input, processed)
+	if not processed and input.KeyCode == Enum.KeyCode.L then
+		Frame.Visible = not Frame.Visible
+	end
+end)
+
+print("Ultra Owner Panel Başarıyla Yüklendi!")
