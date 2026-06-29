@@ -1,14 +1,13 @@
--- [[ UNIVERSAL HUB v2 - RAYFIELD FINAL ]] --
+-- [[ UNIVERSAL HUB v2 - RAYFIELD ULTIMATE ]] --
 
 -- ==========================================
--- 1. GÜVENLİ KEY SİSTEMİ (Kayıtlı)
+-- 1. GÜVENLİ KEY SİSTEMİ
 -- ==========================================
 local player = game.Players.LocalPlayer
 local CORRECT_KEY = "woahmyuniversalscriptissoopv2"
 local keyFile = "UniversalHub_v2_Key.txt"
 local verified = false
 
--- Key Kontrolü
 pcall(function()
     if (readfileexists and readfileexists(keyFile)) or (isfile and isfile(keyFile)) then
         if readfile(keyFile) == CORRECT_KEY then verified = true end
@@ -36,7 +35,7 @@ if not verified then
             pcall(function() writefile(keyFile, CORRECT_KEY) end)
             btn.Text = "Verified! Rejoin Now."
             task.wait(2); screenGui:Destroy()
-            while true do task.wait(1) end -- Rejoin istemek için durduruyoruz
+            while true do task.wait(1) end 
         else
             btn.Text = "Wrong Key!"; task.wait(1); btn.Text = "Verify"
         end
@@ -45,54 +44,56 @@ if not verified then
 end
 
 -- ==========================================
--- 2. RAYFIELD LOAD & WINDOW
+-- 2. RAYFIELD SETUP
 -- ==========================================
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "Universal Hub v2", 
-    LoadingTitle = "Loading Universal Hub...", 
+    LoadingTitle = "Loading Hub...", 
     LoadingSubtitle = "by AI", 
-    ConfigurationSaving = { Enabled = true, Folder = "UniversalHubV2" },
-    Discord = { Enabled = false, Invite = "noinvite", RememberMe = true }
+    ConfigurationSaving = { Enabled = true, Folder = "UniversalHubV2" }
 })
 
 -- ==========================================
--- 3. MOBILE TOGGLE ICON (Sürüklenebilir)
+-- 3. SHORTCUT SYSTEM (SQUIRCLE)
 -- ==========================================
-local ToggleGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-ToggleGui.Name = "RayfieldMobileToggle"; ToggleGui.ResetOnSpawn = false
+local shortGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+shortGui.Name = "HubShortcuts"; shortGui.ResetOnSpawn = false
 
-local OpenBtn = Instance.new("TextButton", ToggleGui)
-OpenBtn.Size = UDim2.new(0, 50, 0, 50); OpenBtn.Position = UDim2.new(0.8, 0, 0.2, 0)
-OpenBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25); OpenBtn.Text = "v2"; OpenBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", OpenBtn).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", OpenBtn).Color = Color3.fromRGB(0, 120, 215)
+local function createShortcut(text, valName)
+    local sBtn = Instance.new("TextButton", shortGui)
+    sBtn.Size = UDim2.new(0, 45, 0, 45); sBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+    sBtn.Text = text:sub(1,2); sBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); sBtn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", sBtn).CornerRadius = UDim.new(0, 12) -- Squircle
+    Instance.new("UIStroke", sBtn).Color = Color3.fromRGB(0, 120, 215)
 
-local dragging, dragStart, startPos
-OpenBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true; dragStart = input.Position; startPos = OpenBtn.Position
-    end
-end)
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        OpenBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-game:GetService("UserInputService").InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
-end)
+    -- Dragging
+    local dragging, dragStart, startPos
+    sBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true; dragStart = input.Position; startPos = sBtn.Position
+        end
+    end)
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            sBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
+    end)
 
-OpenBtn.MouseButton1Click:Connect(function()
-    local rayGui = player.PlayerGui:FindFirstChild("Rayfield") or game:GetService("CoreGui"):FindFirstChild("Rayfield")
-    if rayGui then rayGui.Enabled = not rayGui.Enabled end
-end)
+    sBtn.MouseButton1Click:Connect(function()
+        _G.Settings[valName] = not _G.Settings[valName]
+        sBtn.BackgroundColor3 = _G.Settings[valName] and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(30, 30, 30)
+    end)
+end
 
 -- ==========================================
--- 4. STATE & LOGIC
+-- 4. STATE & SETTINGS
 -- ==========================================
-local Settings = {
+_G.Settings = {
     Fly = false, Noclip = false, InfJump = false, ESP = false,
     SpeedH = false, JumpH = false, Aimbot = false,
     FlySpeed = 50, WalkSpeed = 50, JumpPower = 100
@@ -100,7 +101,6 @@ local Settings = {
 
 local function getChar() return player.Character or player.CharacterAdded:Wait() end
 
--- Bot + Oyuncu Aimbot (Wall Check + 360)
 local function getClosestTarget()
     local closest, dist = nil, math.huge
     for _, obj in pairs(workspace:GetDescendants()) do
@@ -112,7 +112,6 @@ local function getClosestTarget()
                 if mag < dist then
                     local rp = RaycastParams.new()
                     rp.FilterDescendantsInstances = {getChar(), targetChar}
-                    rp.FilterType = Enum.RaycastFilterType.Exclude
                     if not workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (pos - workspace.CurrentCamera.CFrame.Position).Unit * mag, rp) then
                         dist = mag; closest = targetChar.HumanoidRootPart
                     end
@@ -124,79 +123,52 @@ local function getClosestTarget()
 end
 
 -- ==========================================
--- 5. RAYFIELD TABS
+-- 5. UI TABS
 -- ==========================================
 local MainTab = Window:CreateTab("Main Features", 4483362458)
 local SetTab = Window:CreateTab("Power Settings", 4483362458)
 
-MainTab:CreateToggle({
-    Name = "HD Fly (Stiff Pose)",
-    CurrentValue = false,
-    Callback = function(v) Settings.Fly = v end
-})
+local function addFeature(name, val)
+    MainTab:CreateToggle({
+        Name = name,
+        CurrentValue = false,
+        Callback = function(v) _G.Settings[val] = v end
+    })
+    MainTab:CreateButton({
+        Name = "Create Shortcut for " .. name,
+        Callback = function() createShortcut(name, val) end
+    })
+    MainTab:CreateLabel("--------------------------------------------------") -- Boşluk/Çizgi
+end
 
-MainTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Callback = function(v) Settings.Noclip = v end
-})
+addFeature("HD Fly (Stiff)", "Fly")
+addFeature("Noclip", "Noclip")
+addFeature("Infinite Jump", "InfJump")
+addFeature("Aimbot (Bots+Pl)", "Aimbot")
+addFeature("Player ESP", "ESP")
+addFeature("Enable Speed Hack", "SpeedH")
+addFeature("Enable Jump Hack", "JumpH")
 
-MainTab:CreateToggle({
-    Name = "Infinite Jump",
-    CurrentValue = false,
-    Callback = function(v) Settings.InfJump = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Aimbot (Bots+Players)",
-    CurrentValue = false,
-    Callback = function(v) Settings.Aimbot = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Player ESP",
-    CurrentValue = false,
-    Callback = function(v) Settings.ESP = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Enable Speed Hack",
-    CurrentValue = false,
-    Callback = function(v) Settings.SpeedH = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Enable Jump Hack",
-    CurrentValue = false,
-    Callback = function(v) Settings.JumpH = v end
-})
-
-SetTab:CreateSlider({
+SetTab:CreateInput({
     Name = "Fly Speed",
-    Range = {10, 300},
-    Increment = 1,
-    CurrentValue = 50,
-    Callback = function(v) Settings.FlySpeed = v end
+    PlaceholderText = "Enter Number",
+    Callback = function(v) _G.Settings.FlySpeed = tonumber(v) or 50 end
 })
-
-SetTab:CreateSlider({
+SetTab:CreateLabel(" ") -- Boşluk
+SetTab:CreateInput({
     Name = "Walk Speed",
-    Range = {16, 500},
-    Increment = 1,
-    CurrentValue = 50,
-    Callback = function(v) Settings.WalkSpeed = v end
+    PlaceholderText = "Enter Number",
+    Callback = function(v) _G.Settings.WalkSpeed = tonumber(v) or 16 end
 })
-
-SetTab:CreateSlider({
+SetTab:CreateLabel(" ") -- Boşluk
+SetTab:CreateInput({
     Name = "Jump Power",
-    Range = {50, 1000},
-    Increment = 1,
-    CurrentValue = 100,
-    Callback = function(v) Settings.JumpPower = v end
+    PlaceholderText = "Enter Number",
+    Callback = function(v) _G.Settings.JumpPower = tonumber(v) or 50 end
 })
 
 -- ==========================================
--- 6. ENGINE LOOP (Death-Proof)
+-- 6. ENGINE LOOP
 -- ==========================================
 task.spawn(function()
     game:GetService("RunService").Heartbeat:Connect(function()
@@ -206,17 +178,17 @@ task.spawn(function()
             local root = char.HumanoidRootPart
             local hum = char:FindFirstChildOfClass("Humanoid")
 
-            if Settings.Aimbot then
+            if _G.Settings.Aimbot then
                 local target = getClosestTarget()
                 if target then workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position) end
             end
 
-            if Settings.Fly then
+            if _G.Settings.Fly then
                 local bv = root:FindFirstChild("FlyBV") or Instance.new("BodyVelocity", root)
                 bv.Name = "FlyBV"; bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
                 local bg = root:FindFirstChild("FlyBG") or Instance.new("BodyGyro", root)
                 bg.Name = "FlyBG"; bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * Settings.FlySpeed
+                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * _G.Settings.FlySpeed
                 bg.CFrame = workspace.CurrentCamera.CFrame
                 hum.PlatformStand = true
             else
@@ -225,11 +197,11 @@ task.spawn(function()
                 hum.PlatformStand = false
             end
 
-            hum.WalkSpeed = Settings.SpeedH and Settings.WalkSpeed or 16
-            hum.JumpPower = Settings.JumpH and Settings.JumpPower or 50
+            hum.WalkSpeed = _G.Settings.SpeedH and _G.Settings.WalkSpeed or 16
+            hum.JumpPower = _G.Settings.JumpH and _G.Settings.JumpPower or 50
             hum.UseJumpPower = true
 
-            if Settings.Noclip then
+            if _G.Settings.Noclip then
                 for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
             end
         end)
@@ -242,7 +214,7 @@ task.spawn(function()
             for _, p in pairs(game.Players:GetPlayers()) do
                 if p ~= player and p.Character then
                     local hl = p.Character:FindFirstChild("ESP_HL")
-                    if Settings.ESP then
+                    if _G.Settings.ESP then
                         if not hl then hl = Instance.new("Highlight", p.Character); hl.Name = "ESP_HL"; hl.FillColor = Color3.new(1,0,0) end
                     elseif hl then hl:Destroy() end
                 end
@@ -252,5 +224,5 @@ task.spawn(function()
 end)
 
 game:GetService("UserInputService").JumpRequest:Connect(function()
-    pcall(function() if Settings.InfJump then getChar():FindFirstChildOfClass("Humanoid"):ChangeState("Jumping") end end)
+    pcall(function() if _G.Settings.InfJump then getChar():FindFirstChildOfClass("Humanoid"):ChangeState("Jumping") end end)
 end)
