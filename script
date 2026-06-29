@@ -1,220 +1,348 @@
 --[[ 
-    ULTIMATE OWNER PANEL (MOBILE SUPPORTED)
-    Sadece oyun sahibi için otomatik yetkilendirme.
-    Sürüklenebilir, Mobil Uyumlu ve Çok Fonksiyonlu.
+    UNIVERSAL HUB V2 - BÖLÜM 1
 --]]
 
 local Player = game.Players.LocalPlayer
-local Mouse = Player:GetMouse()
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
+
+-- AYARLAR VE ÇEVİRİLER
+local Langs = {
+	["TR"] = {
+		["Welcome"] = "UNIVERSAL HUB V2",
+		["EnterKey"] = "Anahtarı Giriniz:",
+		["WrongKey"] = "Hatalı Anahtar!",
+		["CorrectKey"] = "Giriş Başarılı!",
+		["SelectLang"] = "Dil Seçiniz",
+		["SelectDev"] = "Cihaz Seçiniz",
+		["PC"] = "Bilgisayar",
+		["Mobile"] = "Mobil",
+		["Fly"] = "Uçuş",
+		["Noclip"] = "Duvar Geçme",
+		["InfJump"] = "Sınırsız Zıplama",
+		["ESP"] = "Oyuncu Takibi",
+		["GodMode"] = "Ölümsüzlük",
+		["Speed"] = "Hız: 100",
+		["Jump"] = "Süper Zıplama",
+		["Reset"] = "Sıfırla",
+		["CloseHint"] = "Menü Kapalı. Açmak için 'L' tuşuna bas!",
+		["Dev"] = "Geliştirici: Owner"
+	},
+	["EN"] = {
+		["Welcome"] = "UNIVERSAL HUB V2",
+		["EnterKey"] = "Enter Key:",
+		["WrongKey"] = "Wrong Key!",
+		["CorrectKey"] = "Access Granted!",
+		["SelectLang"] = "Select Language",
+		["SelectDev"] = "Select Device",
+		["PC"] = "PC",
+		["Mobile"] = "Mobile",
+		["Fly"] = "Fly",
+		["Noclip"] = "Noclip",
+		["InfJump"] = "Infinite Jump",
+		["ESP"] = "ESP",
+		["GodMode"] = "God Mode",
+		["Speed"] = "Speed: 100",
+		["Jump"] = "Super Jump",
+		["Reset"] = "Reset",
+		["CloseHint"] = "Menu Closed. Press 'L' to open!",
+		["Dev"] = "Developer: Owner"
+	}
+}
+
+local CurrentLang = "TR"
+local CorrectKey = "woahmyuniversalscriptissoopv2"
 
 -- GUI ANA YAPI
 local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
-ScreenGui.Name = "UltimateOwnerPanel"
+ScreenGui.Name = "UniversalHubV2"
 ScreenGui.ResetOnSpawn = false
 
--- AÇ/KAPAT BUTONU (Mobil için şart)
-local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
-ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
-ToggleBtn.Text = "PANEL"
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
-ToggleBtn.BorderSizePixel = 2
-ToggleBtn.Font = Enum.Font.SourceSansBold
-ToggleBtn.TextSize = 14
+local function makeSquircle(obj)
+	local corner = Instance.new("UICorner", obj)
+	corner.CornerRadius = UDim.new(0, 12)
+end
 
--- ANA PANEL
-local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 250, 0, 350)
-Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Frame.BorderSizePixel = 0
-Frame.Visible = true
-Frame.Active = true
-Frame.Draggable = true -- Sürüklenebilir özellik
+-- 1. KEY EKRANI
+local KeyFrame = Instance.new("Frame", ScreenGui)
+KeyFrame.Size = UDim2.new(0, 300, 0, 200)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+KeyFrame.BorderSizePixel = 0
+makeSquircle(KeyFrame)
 
--- Köşeleri Yuvarla
-local Corner = Instance.new("UICorner", Frame)
-Corner.CornerRadius = UDim.new(0, 10)
+local KeyTitle = Instance.new("TextLabel", KeyFrame)
+KeyTitle.Size = UDim2.new(1, 0, 0, 50)
+KeyTitle.Text = Langs[CurrentLang]["Welcome"]
+KeyTitle.TextColor3 = Color3.new(1, 1, 1)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.TextSize = 20
 
-local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "OWNER PANEL v2 (Ultra)"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 18
-local TitleCorner = Instance.new("UICorner", Title)
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 40)
+KeyInput.Position = UDim2.new(0.1, 0, 0.3, 0)
+KeyInput.PlaceholderText = Langs[CurrentLang]["EnterKey"]
+KeyInput.Text = ""
+KeyInput.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+KeyInput.TextColor3 = Color3.new(1, 1, 1)
+makeSquircle(KeyInput)
 
--- SCROLLING FRAME (Çok fazla buton sığması için)
-local Scroll = Instance.new("ScrollingFrame", Frame)
+local KeySubmit = Instance.new("TextButton", KeyFrame)
+KeySubmit.Size = UDim2.new(0.8, 0, 0, 40)
+KeySubmit.Position = UDim2.new(0.1, 0, 0.6, 0)
+KeySubmit.Text = "Giriş Yap"
+KeySubmit.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+KeySubmit.TextColor3 = Color3.new(1, 1, 1)
+KeySubmit.Font = Enum.Font.GothamBold
+makeSquircle(KeySubmit)
+
+-- 2. DİL VE CİHAZ SEÇİM EKRANI
+local SetupFrame = Instance.new("Frame", ScreenGui)
+SetupFrame.Size = UDim2.new(0, 300, 0, 250)
+SetupFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
+SetupFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+SetupFrame.Visible = false
+makeSquircle(SetupFrame)
+
+-- 3. ANA PANEL
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 260, 0, 380)
+MainFrame.Position = UDim2.new(0.4, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+makeSquircle(MainFrame)
+
+local MainTitle = Instance.new("TextLabel", MainFrame)
+MainTitle.Size = UDim2.new(1, 0, 0, 45)
+MainTitle.Text = "UNIVERSAL HUB V2"
+MainTitle.TextColor3 = Color3.new(1, 1, 1)
+MainTitle.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+MainTitle.Font = Enum.Font.GothamBold
+makeSquircle(MainTitle)
+
+local Scroll = Instance.new("ScrollingFrame", MainFrame)
 Scroll.Size = UDim2.new(1, -20, 1, -60)
-Scroll.Position = UDim2.new(0, 10, 0, 50)
+Scroll.Position = UDim2.new(0, 10, 0, 55)
 Scroll.BackgroundTransparency = 1
-Scroll.CanvasSize = UDim2.new(0, 0, 2, 0) -- İçerik uzadıkça kaydırılabilir
-Scroll.ScrollBarThickness = 5
+Scroll.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+Scroll.ScrollBarThickness = 2
 
 local Layout = Instance.new("UIListLayout", Scroll)
-Layout.Padding = UDim.new(0, 5)
+Layout.Padding = UDim.new(0, 8)
 Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- BUTON OLUŞTURMA FONKSİYONU
-local function createBtn(text, color, callback)
-	local btn = Instance.new("TextButton", Scroll)
-	btn.Size = UDim2.new(0.9, 0, 0, 35)
+local MinBtn = Instance.new("TextButton", MainFrame)
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -35, 0, 5)
+MinBtn.Text = "-"
+MinBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+makeSquircle(MinBtn)
+
+local InfoLabel = Instance.new("TextLabel", ScreenGui)
+InfoLabel.Size = UDim2.new(0, 300, 0, 40)
+InfoLabel.Position = UDim2.new(0.5, -150, 0.1, 0)
+InfoLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+InfoLabel.TextColor3 = Color3.new(1, 1, 1)
+InfoLabel.Text = ""
+InfoLabel.Visible = false
+InfoLabel.Font = Enum.Font.Gotham
+makeSquircle(InfoLabel)
+
+local OpenBtn = Instance.new("TextButton", ScreenGui)
+OpenBtn.Size = UDim2.new(0, 50, 0, 50)
+OpenBtn.Position = UDim2.new(0, 20, 0.5, -25)
+OpenBtn.Text = "HUB"
+OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+OpenBtn.TextColor3 = Color3.new(1, 1, 1)
+OpenBtn.Visible = false
+makeSquircle(OpenBtn)
+--[[ 
+    UNIVERSAL HUB V2 - BÖLÜM 2
+--]]
+
+-- İkon Animasyonu
+task.spawn(function()
+	while true do
+		TweenService:Create(OpenBtn, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 60, 0, 60), Position = UDim2.new(0, 15, 0.5, -30)}):Play()
+		task.wait(1)
+		TweenService:Create(OpenBtn, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 50, 0, 50), Position = UDim2.new(0, 20, 0.5, -25)}):Play()
+		task.wait(1)
+	end
+end)
+
+local function createSetupBtn(text, pos, color, callback)
+	local btn = Instance.new("TextButton", SetupFrame)
+	btn.Size = UDim2.new(0.8, 0, 0, 40)
+	btn.Position = pos
 	btn.Text = text
 	btn.BackgroundColor3 = color
 	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.SourceSans
-	btn.TextSize = 16
-	local bCorner = Instance.new("UICorner", btn)
-	bCorner.CornerRadius = UDim.new(0, 6)
+	btn.Font = Enum.Font.Gotham
+	makeSquircle(btn)
+	btn.MouseButton1Click:Connect(callback)
+end
+
+local function createMainBtn(textKey, color, callback)
+	local btn = Instance.new("TextButton", Scroll)
+	btn.Size = UDim2.new(0.9, 0, 0, 38)
+	btn.Text = Langs[CurrentLang][textKey] or textKey
+	btn.BackgroundColor3 = color
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	makeSquircle(btn)
 	btn.MouseButton1Click:Connect(callback)
 	return btn
 end
 
--- ==========================================
--- FONKSİYONLAR VE ÖZELLİKLER
--- ==========================================
-
--- 1. HIZ
-createBtn("Hız: 100", Color3.fromRGB(0, 120, 215), function()
-	Player.Character.Humanoid.WalkSpeed = 100
-end)
-
--- 2. ZIPLAMA
-createBtn("Süper Zıplama", Color3.fromRGB(0, 150, 0), function()
-	Player.Character.Humanoid.JumpPower = 150
-end)
-
--- 3. RESET
-createBtn("Sıfırla (Hız/Zıplama)", Color3.fromRGB(150, 0, 0), function()
-	Player.Character.Humanoid.WalkSpeed = 16
-	Player.Character.Humanoid.JumpPower = 50
-end)
-
--- 4. INFINITE JUMP (Sınırsız Zıplama)
-local InfJump = false
-createBtn("Sınırsız Zıplama: KAPALI", Color3.fromRGB(80, 80, 80), function(self)
-	InfJump = not InfJump
-	-- Buton textini güncellemek için local referans gerekir, bu yüzden fonksiyon içinde yapıyoruz
-	-- Not: Basitlik için butonu tekrar oluşturmak yerine text değiştiriyoruz
-end)
--- Butonun textini güncellemek için yukarıdaki fonksiyonu biraz modifiye edelim:
-local jumpBtn = createBtn("Sınırsız Zıplama: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
-jumpBtn.MouseButton1Click:Connect(function()
-	InfJump = not InfJump
-	jumpBtn.Text = InfJump and "Sınırsız Zıplama: AÇIK" or "Sınırsız Zıplama: KAPALI"
-	jumpBtn.BackgroundColor3 = InfJump and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
-end)
-
-UserInputService.JumpRequest:Connect(function()
-	if InfJump then
-		Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+-- ÖZELLİKLER
+local flying = false
+local flyBtn = createMainBtn("Fly", Color3.fromRGB(60, 60, 70), function() end)
+flyBtn.MouseButton1Click:Connect(function()
+	flying = not flying
+	flyBtn.Text = flying and "Fly: ON" or Langs[CurrentLang]["Fly"]
+	flyBtn.BackgroundColor3 = flying and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 70)
+	local char = Player.Character
+	local root = char:WaitForChild("HumanoidRootPart")
+	if flying then
+		local bv = Instance.new("BodyVelocity", root)
+		bv.Name = "FlyBV"
+		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+		local bg = Instance.new("BodyGyro", root)
+		bg.Name = "FlyBG"
+		bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+		task.spawn(function()
+			while flying do
+				bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 70
+				bg.CFrame = workspace.CurrentCamera.CFrame
+				task.wait()
+			end
+			bv:Destroy() bg:Destroy()
+		end)
 	end
 end)
 
--- 5. NOCLIP (Duvar Geçme)
-local Noclip = false
-local noclipBtn = createBtn("Noclip: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+local noclip = false
+local noclipBtn = createMainBtn("Noclip", Color3.fromRGB(60, 60, 70), function() end)
 noclipBtn.MouseButton1Click:Connect(function()
-	Noclip = not Noclip
-	noclipBtn.Text = Noclip and "Noclip: AÇIK" or "Noclip: KAPALI"
-	noclipBtn.BackgroundColor3 = Noclip and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
+	noclip = not noclip
+	noclipBtn.Text = noclip and "Noclip: ON" or Langs[CurrentLang]["Noclip"]
+	noclipBtn.BackgroundColor3 = noclip and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 70)
 end)
-
 RunService.Stepped:Connect(function()
-	if Noclip then
-		for _, part in pairs(Player.Character:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.CanCollide = false
-			end
+	if noclip then
+		for _, v in pairs(Player.Character:GetDescendants()) do
+			if v:IsA("BasePart") then v.CanCollide = false end
 		end
 	end
 end)
 
--- 6. FULLBRIGHT (Aydınlatma)
-local Bright = false
-local brightBtn = createBtn("Gece Görüşü: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
-brightBtn.MouseButton1Click:Connect(function()
-	Bright = not Bright
-	brightBtn.Text = Bright and "Gece Görüşü: AÇIK" or "Gece Görüşü: KAPALI"
-	if Bright then
-		Lighting.Brightness = 2
-		Lighting.ClockTime = 14
-		Lighting.GlobalShadows = false
-	else
-		Lighting.Brightness = 1
-		Lighting.GlobalShadows = true
-	end
+local infjump = false
+local ijBtn = createMainBtn("InfJump", Color3.fromRGB(60, 60, 70), function() end)
+ijBtn.MouseButton1Click:Connect(function()
+	infjump = not infjump
+	ijBtn.Text = infjump and "InfJump: ON" or Langs[CurrentLang]["InfJump"]
+	ijBtn.BackgroundColor3 = infjump and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 70)
+end)
+UserInputService.JumpRequest:Connect(function()
+	if infjump then Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping") end
 end)
 
--- 7. FOV CHANGER (Görüş Açısı)
-createBtn("Geniş Görüş (FOV)", Color3.fromRGB(120, 0, 120), function()
-	game.Workspace.CurrentCamera.FieldOfView = 110
-end)
-
-createBtn("Normal Görüş (FOV)", Color3.fromRGB(100, 100, 100), function()
-	game.Workspace.CurrentCamera.FieldOfView = 70
-end)
-
--- 8. ESP (Oyuncuları İşaretle)
-local ESP = false
-local espBtn = createBtn("ESP: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
+local esp = false
+local espBtn = createMainBtn("ESP", Color3.fromRGB(60, 60, 70), function() end)
 espBtn.MouseButton1Click:Connect(function()
-	ESP = not ESP
-	espBtn.Text = ESP and "ESP: AÇIK" or "ESP: KAPALI"
-	if not ESP then
-		for _, p in pairs(game.Players:GetPlayers()) do
-			if p.Character and p.Character:FindFirstChild("Highlight") then
-				p.Character.Highlight:Destroy()
-			end
-		end
-	end
+	esp = not esp
+	espBtn.Text = esp and "ESP: ON" or Langs[CurrentLang]["ESP"]
+	espBtn.BackgroundColor3 = esp and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 70)
 end)
-
 RunService.RenderStepped:Connect(function()
-	if ESP then
+	if esp then
 		for _, p in pairs(game.Players:GetPlayers()) do
 			if p ~= Player and p.Character then
-				if not p.Character:FindFirstChild("Highlight") then
-					local hl = Instance.new("Highlight", p.Character)
-					hl.FillColor = Color3.new(1, 0, 0)
-					hl.OutlineColor = Color3.new(1, 1, 1)
+				if not p.Character:FindFirstChild("HubHighlight") then
+					local h = Instance.new("Highlight", p.Character)
+					h.Name = "HubHighlight"
+					h.FillColor = Color3.new(1, 0, 0)
 				end
 			end
 		end
 	end
 end)
 
--- 9. LOCAL GOD MODE (Yerel Ölümsüzlük)
-local God = false
-local godBtn = createBtn("God Mode: KAPALI", Color3.fromRGB(80, 80, 80), function() end)
-godBtn.MouseButton1Click:Connect(function()
-	God = not God
-	godBtn.Text = God and "God Mode: AÇIK" or "God Mode: KAPALI"
-	if God then
-		Player.Character.Humanoid.MaxHealth = math.huge
-		Player.Character.Humanoid.Health = math.huge
+createMainBtn("Speed", Color3.fromRGB(0, 120, 215), function() Player.Character.Humanoid.WalkSpeed = 100 end)
+createMainBtn("Jump", Color3.fromRGB(0, 150, 0), function() Player.Character.Humanoid.JumpPower = 150 end)
+createMainBtn("Reset", Color3.fromRGB(150, 0, 0), function() 
+	Player.Character.Humanoid.WalkSpeed = 16 
+	Player.Character.Humanoid.JumpPower = 50 
+end)
+
+-- LOGIC
+KeySubmit.MouseButton1Click:Connect(function()
+	if KeyInput.Text == CorrectKey then
+		KeyTitle.Text = Langs[CurrentLang]["CorrectKey"]
+		KeySubmit.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		task.wait(1)
+		KeyFrame.Visible = false
+		SetupFrame.Visible = true
 	else
-		Player.Character.Humanoid.MaxHealth = 100
-		Player.Character.Humanoid.Health = 100
+		KeyTitle.Text = Langs[CurrentLang]["WrongKey"]
+		KeySubmit.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		task.wait(1)
+		KeyTitle.Text = Langs[CurrentLang]["Welcome"]
+		KeySubmit.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 	end
 end)
 
--- PANEL AÇ/KAPAT SİSTEMİ
-ToggleBtn.MouseButton1Click:Connect(function()
-	Frame.Visible = not Frame.Visible
+createSetupBtn("Türkçe / TR", UDim2.new(0.1, 0, 0.2, 0), Color3.fromRGB(50, 50, 60), function()
+	CurrentLang = "TR"
+	MainTitle.Text = "UNIVERSAL HUB V2"
+	SetupFrame.Visible = false
+	MainFrame.Visible = true
+	OpenBtn.Visible = true
 end)
 
--- Klavye 'L' tuşu desteği (PC için kalsın)
+createSetupBtn("English / EN", UDim2.new(0.1, 0, 0.35, 0), Color3.fromRGB(50, 50, 60), function()
+	CurrentLang = "EN"
+	SetupFrame.Visible = false
+	MainFrame.Visible = true
+	OpenBtn.Visible = true
+end)
+
+createSetupBtn(Langs[CurrentLang]["PC"], UDim2.new(0.1, 0, 0.6, 0), Color3.fromRGB(80, 0, 150), function()
+	SetupFrame.Visible = false
+	MainFrame.Visible = true
+	OpenBtn.Visible = false
+end)
+
+createSetupBtn(Langs[CurrentLang]["Mobile"], UDim2.new(0.1, 0, 0.75, 0), Color3.fromRGB(0, 150, 150), function()
+	SetupFrame.Visible = false
+	MainFrame.Visible = true
+	OpenBtn.Visible = true
+end)
+
+MinBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	InfoLabel.Text = Langs[CurrentLang]["CloseHint"]
+	InfoLabel.Visible = true
+	task.wait(3)
+	InfoLabel.Visible = false
+end)
+
+local function toggleMain()
+	MainFrame.Visible = not MainFrame.Visible
+	if MainFrame.Visible then InfoLabel.Visible = false end
+end
+
+OpenBtn.MouseButton1Click:Connect(toggleMain)
 UserInputService.InputBegan:Connect(function(input, processed)
 	if not processed and input.KeyCode == Enum.KeyCode.L then
-		Frame.Visible = not Frame.Visible
+		toggleMain()
 	end
 end)
 
-print("Ultra Owner Panel Başarıyla Yüklendi!")
+print("Universal Hub V2 Loaded Successfully!")
