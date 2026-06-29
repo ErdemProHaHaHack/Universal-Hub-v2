@@ -1,16 +1,14 @@
--- [[ PART 1: DATA & UNIVERSAL KEY SYSTEM - BUG FIXED ]] --
+-- [[ PART 1: DATABASE & PERSISTENT KEY ]] --
 local player = game.Players.LocalPlayer
 local pg = player:WaitForChild("PlayerGui")
 
--- Create Hidden Database
+-- Veritabanı Oluşturma
 local db = Instance.new("Folder", pg)
 db.Name = "HubData_v2"
 
 local function createVal(class, name, val)
     local v = Instance.new(class)
-    v.Name = name
-    v.Value = val
-    v.Parent = db
+    v.Name = name; v.Value = val; v.Parent = db
 end
 
 createVal("BoolValue", "Verified", false)
@@ -25,76 +23,62 @@ createVal("NumberValue", "FlySpeed", 50)
 createVal("NumberValue", "WalkSpeed", 50)
 createVal("NumberValue", "JumpPower", 100)
 
--- KEY PERSISTENCE SYSTEM (Fixed Line 32)
 local keyFile = "UniversalHub_v2_Key.txt"
 local CORRECT_KEY = "woahmyuniversalscriptissoopv2"
 local keyExists = false
 
--- Safe Check for File System (Prevents Crash)
+-- Dosya kontrolü (Executor desteğine göre)
 pcall(function()
-    if readfileexists and readfileexists(keyFile) then
-        keyExists = true
-    elseif isfile and isfile(keyFile) then
+    if (readfileexists and readfileexists(keyFile)) or (isfile and isfile(keyFile)) then
         keyExists = true
     end
 end)
 
 if keyExists then
     pcall(function()
-        local savedKey = readfile(keyFile)
-        if savedKey == CORRECT_KEY then
-            db.Verified.Value = true
-        end
+        if readfile(keyFile) == CORRECT_KEY then db.Verified.Value = true end
     end)
 end
 
--- If not verified, show the UI
+-- Key Ekranı (Sadece doğrulanmamışsa çıkar)
 if not db.Verified.Value then
     local screenGui = Instance.new("ScreenGui", pg)
-    screenGui.Name = "KeyGui_v2"
-
     local keyFrame = Instance.new("Frame", screenGui)
-    keyFrame.Size = UDim2.new(0, 280, 0, 180)
-    keyFrame.Position = UDim2.new(0.5, -140, 0.5, -90)
-    keyFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 10)
+    keyFrame.Size = UDim2.new(0, 300, 0, 200)
+    keyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 15)
+    Instance.new("UIStroke", keyFrame).Color = Color3.fromRGB(0, 120, 215)
 
     local title = Instance.new("TextLabel", keyFrame)
-    title.Size = UDim2.new(1, 0, 0, 40)
-    title.Text = "UNIVERSAL HUB v2 - ACCESS"
-    title.TextColor3 = Color3.new(1, 1, 1)
-    title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    Instance.new("UICorner", title)
+    title.Size = UDim2.new(1, 0, 0, 50); title.Text = "UNIVERSAL HUB v2"; title.TextColor3 = Color3.new(1,1,1); title.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", title)
 
     local input = Instance.new("TextBox", keyFrame)
-    input.Size = UDim2.new(0.8, 0, 0, 40)
-    input.Position = UDim2.new(0.1, 0, 0.35, 0)
-    input.PlaceholderText = "Enter Key..."
-    input.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    input.TextColor3 = Color3.new(1, 1, 1)
-    Instance.new("UICorner", input)
+    input.Size = UDim2.new(0.8, 0, 0, 45); input.Position = UDim2.new(0.1, 0, 0.35, 0); input.PlaceholderText = "Enter Key..."; input.BackgroundColor3 = Color3.fromRGB(40,40,40); input.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", input)
 
     local btn = Instance.new("TextButton", keyFrame)
-    btn.Size = UDim2.new(0.8, 0, 0, 40)
-    btn.Position = UDim2.new(0.1, 0, 0.65, 0)
-    btn.Text = "Verify"
-    btn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    Instance.new("UICorner", btn)
+    btn.Size = UDim2.new(0.8, 0, 0, 45); btn.Position = UDim2.new(0.1, 0, 0.65, 0); btn.Text = "Verify"; btn.BackgroundColor3 = Color3.fromRGB(0, 120, 215); btn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", btn)
 
     btn.MouseButton1Click:Connect(function()
         if input.Text == CORRECT_KEY then
             pcall(function() writefile(keyFile, CORRECT_KEY) end)
-            db.Verified.Value = true
+            btn.Text = "Success!"
+            btn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+            task.wait(1)
+            -- İSTEDİĞİN MESAJ
+            btn.Text = "Pls rejoin and execute script again"
+            btn.Size = UDim2.new(0.9, 0, 0, 30)
+            btn.Position = UDim2.new(0.05, 0, 0.65, 0)
+            task.wait(5)
             screenGui:Destroy()
         else
-            btn.Text = "Wrong Key!"
-            task.wait(1)
-            btn.Text = "Verify"
+            btn.Text = "Wrong Key!"; task.wait(1); btn.Text = "Verify"
         end
     end)
+    -- Key girilmeden diğer partlar çalışmasın diye scripti burada durduruyoruz
+    return 
 end
--- [[ PART 2: MODERN UI & DRAGGABLE ICON ]] --
+-- [[ PART 2: MODERN UI & FULLSCREEN ]] --
 local player = game.Players.LocalPlayer
 local pg = player:WaitForChild("PlayerGui")
 local db = pg:WaitForChild("HubData_v2")
@@ -105,17 +89,14 @@ local screenGui = Instance.new("ScreenGui", pg)
 screenGui.Name = "MainGui_v2"
 screenGui.ResetOnSpawn = false
 
--- DRAGGABLE ICON
+-- Hareketli İkon (Mobile + PC)
 local icon = Instance.new("TextButton", screenGui)
-icon.Size = UDim2.new(0, 50, 0, 50)
-icon.Position = UDim2.new(0.1, 0, 0.1, 0)
-icon.Text = "v2"
-icon.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-icon.TextColor3 = Color3.new(1, 1, 1)
+icon.Size = UDim2.new(0, 50, 0, 50); icon.Position = UDim2.new(0.1, 0, 0.1, 0); icon.Text = "v2"
+icon.BackgroundColor3 = Color3.fromRGB(30, 30, 30); icon.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", icon).Color = Color3.fromRGB(0, 120, 215)
 
--- Dragging Logic for Icon
+-- Gelişmiş Sürükleme Sistemi
 local dragging, dragInput, dragStart, startPos
 icon.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -132,46 +113,42 @@ game:GetService("UserInputService").InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
 end)
 
--- MAIN FRAME
+-- Ana Panel
 local main = Instance.new("Frame", screenGui)
-main.Size = UDim2.new(0, 230, 0, 400)
-main.Position = UDim2.new(0.5, -115, 0.5, -200)
+main.Size = UDim2.new(0, 250, 0, 400)
+main.Position = UDim2.new(0.5, -125, 0.5, -200)
 main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 main.Visible = false
 Instance.new("UICorner", main)
+Instance.new("UIStroke", main).Color = Color3.fromRGB(40, 40, 40)
 
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "Universal Hub v2"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Instance.new("UICorner", title)
+title.Size = UDim2.new(1, 0, 0, 40); title.Text = "Universal Hub v2"; title.TextColor3 = Color3.new(1,1,1); title.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", title)
 
-local close = Instance.new("TextButton", main)
-close.Size = UDim2.new(0, 30, 0, 30)
-close.Position = UDim2.new(1, -35, 0, 5)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
-close.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", close)
+-- Tam Ekran Tuşu
+local fullBtn = Instance.new("TextButton", main)
+fullBtn.Size = UDim2.new(0, 30, 0, 30); fullBtn.Position = UDim2.new(1, -35, 0, 5); fullBtn.Text = "□"; fullBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50); fullBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", fullBtn)
+
+local isFull = false
+fullBtn.MouseButton1Click:Connect(function()
+    isFull = not isFull
+    if isFull then
+        main.Size = UDim2.new(1, 0, 1, 0); main.Position = UDim2.new(0, 0, 0, 0)
+    else
+        main.Size = UDim2.new(0, 250, 0, 400); main.Position = UDim2.new(0.5, -125, 0.5, -200)
+    end
+end)
 
 icon.MouseButton1Click:Connect(function() main.Visible = not main.Visible end)
-close.MouseButton1Click:Connect(function() main.Visible = false end)
 
 local scroll = Instance.new("ScrollingFrame", main)
-scroll.Size = UDim2.new(1, -10, 1, -50)
-scroll.Position = UDim2.new(0, 5, 0, 45)
-scroll.CanvasSize = UDim2.new(0, 0, 2, 0)
-scroll.BackgroundTransparency = 1
-Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 5)
+scroll.Size = UDim2.new(1, -20, 1, -60); scroll.Position = UDim2.new(0, 10, 0, 50); scroll.CanvasSize = UDim2.new(0, 0, 2, 0); scroll.BackgroundTransparency = 1
+Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 7)
 
--- UI Helpers
+-- UI Helper Fonksiyonları
 _G.AddToggle = function(text, valName)
     local btn = Instance.new("TextButton", scroll)
-    btn.Size = UDim2.new(1, 0, 0, 35)
-    btn.Text = text .. ": OFF"
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Size = UDim2.new(1, 0, 0, 35); btn.Text = text .. ": OFF"; btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1, 1, 1)
     Instance.new("UICorner", btn)
     btn.MouseButton1Click:Connect(function()
         db[valName].Value = not db[valName].Value
@@ -181,34 +158,22 @@ _G.AddToggle = function(text, valName)
 end
 
 _G.AddInput = function(text, valName)
-    local f = Instance.new("Frame", scroll)
-    f.Size = UDim2.new(1, 0, 0, 35)
-    f.BackgroundTransparency = 1
-    local l = Instance.new("TextLabel", f)
-    l.Size = UDim2.new(0.5, 0, 1, 0)
-    l.Text = text
-    l.TextColor3 = Color3.new(1, 1, 1)
-    l.BackgroundTransparency = 1
-    local i = Instance.new("TextBox", f)
-    i.Size = UDim2.new(0.4, 0, 0.8, 0)
-    i.Position = UDim2.new(0.5, 0, 0.1, 0)
-    i.Text = tostring(db[valName].Value)
-    i.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    i.TextColor3 = Color3.new(1, 1, 1)
-    Instance.new("UICorner", i)
+    local f = Instance.new("Frame", scroll); f.Size = UDim2.new(1, 0, 0, 35); f.BackgroundTransparency = 1
+    local l = Instance.new("TextLabel", f); l.Size = UDim2.new(0.5, 0, 1, 0); l.Text = text; l.TextColor3 = Color3.new(1, 1, 1); l.BackgroundTransparency = 1
+    local i = Instance.new("TextBox", f); i.Size = UDim2.new(0.4, 0, 0.8, 0); i.Position = UDim2.new(0.5, 0, 0.1, 0); i.Text = tostring(db[valName].Value); i.BackgroundColor3 = Color3.fromRGB(40, 40, 40); i.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", i)
     i.FocusLost:Connect(function() db[valName].Value = tonumber(i.Text) or db[valName].Value end)
 end
--- [[ PART 3: THE ENGINE ]] --
+-- [[ PART 3: ENGINE & HD-FLY ]] --
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local pg = player:WaitForChild("PlayerGui")
 local db = pg:WaitForChild("HubData_v2")
+local camera = workspace.CurrentCamera
 
--- UI Elements
 _G.AddInput("Fly Speed:", "FlySpeed")
 _G.AddInput("Walk Speed:", "WalkSpeed")
 _G.AddInput("Jump Power:", "JumpPower")
-_G.AddToggle("Fly Hack", "IsFlying")
+_G.AddToggle("Fly Hack (HD)", "IsFlying")
 _G.AddToggle("Noclip", "Noclip")
 _G.AddToggle("Inf Jump", "InfJump")
 _G.AddToggle("ESP", "ESP")
@@ -216,23 +181,19 @@ _G.AddToggle("Speed Hack", "SpeedHack")
 _G.AddToggle("Jump Hack", "JumpHack")
 _G.AddToggle("Aimbot 360", "Aimbot")
 
--- AimbOT Logic (360 + Wall Check)
+-- AIMBOT 360 & WALL CHECK
 local function getClosestPlayer()
     local closest, dist = nil, math.huge
     for _, p in pairs(game.Players:GetPlayers()) do
         if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
             local pos = p.Character.HumanoidRootPart.Position
-            local magnitude = (pos - player.Character.HumanoidRootPart.Position).Magnitude
+            local magnitude = (pos - camera.CFrame.Position).Magnitude
             if magnitude < dist then
-                -- WALL CHECK (Raycast)
                 local rayParams = RaycastParams.new()
                 rayParams.FilterDescendantsInstances = {player.Character, p.Character}
                 rayParams.FilterType = Enum.RaycastFilterType.Exclude
-                
-                local result = workspace:Raycast(camera.CFrame.Position, (pos - camera.CFrame.Position).Unit * magnitude, rayParams)
-                if not result then -- No wall in between
-                    dist = magnitude
-                    closest = p
+                if not workspace:Raycast(camera.CFrame.Position, (pos - camera.CFrame.Position).Unit * magnitude, rayParams) then
+                    dist = magnitude; closest = p
                 end
             end
         end
@@ -240,59 +201,58 @@ local function getClosestPlayer()
     return closest
 end
 
--- Main Loop
+-- ANA LOOP
 RunService.RenderStepped:Connect(function()
     local char = player.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local root = char.HumanoidRootPart
     local hum = char:FindFirstChildOfClass("Humanoid")
 
-    -- Aimbot Logic
+    -- AIMBOT
     if db.Aimbot.Value then
         local target = getClosestPlayer()
-        if target and target.Character then
-            camera.CFrame = CFrame.new(camera.CFrame.Position, target.Character.HumanoidRootPart.Position)
-        end
+        if target then camera.CFrame = CFrame.new(camera.CFrame.Position, target.Character.HumanoidRootPart.Position) end
     end
 
-    -- Fly Logic
+    -- HD FLY (KASKATI DURUŞ & KAMERA DÖNÜŞÜ)
     if db.IsFlying.Value then
-        local root = char.HumanoidRootPart
         local bv = root:FindFirstChild("FlyBV") or Instance.new("BodyVelocity", root)
         bv.Name = "FlyBV"; bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
         local bg = root:FindFirstChild("FlyBG") or Instance.new("BodyGyro", root)
         bg.Name = "FlyBG"; bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        
         bv.Velocity = camera.CFrame.LookVector * db.FlySpeed.Value
         bg.CFrame = camera.CFrame
-        hum.PlatformStand = true
+        hum.PlatformStand = true -- Elleri aşağı indirir, kaskatı yapar
     else
-        if char.HumanoidRootPart:FindFirstChild("FlyBV") then char.HumanoidRootPart.FlyBV:Destroy() end
-        if char.HumanoidRootPart:FindFirstChild("FlyBG") then char.HumanoidRootPart.FlyBG:Destroy() end
+        if root:FindFirstChild("FlyBV") then root.FlyBV:Destroy() end
+        if root:FindFirstChild("FlyBG") then root.FlyBG:Destroy() end
         hum.PlatformStand = false
     end
 
-    -- Speed/Jump Hacks
+    -- SPEED & JUMP
     hum.WalkSpeed = db.SpeedHack.Value and db.WalkSpeed.Value or 16
     hum.JumpPower = db.JumpHack.Value and db.JumpPower.Value or 50
     hum.UseJumpPower = true
 
-    -- Noclip
+    -- NOCLIP
     if db.Noclip.Value then
         for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end
     end
 end)
 
--- ESP Loop (Fixed Memory Leak)
+-- ESP (Optimization)
 task.spawn(function()
     while task.wait(1) do
         for _, p in pairs(game.Players:GetPlayers()) do
             if p ~= player and p.Character then
-                local high = p.Character:FindFirstChild("ESP_HL")
+                local hl = p.Character:FindFirstChild("ESP_HL")
                 if db.ESP.Value then
-                    if not high then
-                        high = Instance.new("Highlight", p.Character)
-                        high.Name = "ESP_HL"; high.FillColor = Color3.new(1,0,0)
+                    if not hl then
+                        hl = Instance.new("Highlight", p.Character)
+                        hl.Name = "ESP_HL"; hl.FillColor = Color3.new(1,0,0)
                     end
-                elseif high then high:Destroy() end
+                elseif hl then hl:Destroy() end
             end
         end
     end
