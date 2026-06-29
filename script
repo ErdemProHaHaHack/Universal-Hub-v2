@@ -1,4 +1,4 @@
--- [[ UNIVERSAL HUB v2 - RAYFIELD ULTIMATE ]] --
+-- [[ UNIVERSAL HUB v2 - RAYFIELD FINAL FIX ]] --
 
 -- ==========================================
 -- 1. GÜVENLİ KEY SİSTEMİ
@@ -55,16 +55,17 @@ local Window = Rayfield:CreateWindow({
 })
 
 -- ==========================================
--- 3. SHORTCUT SYSTEM (SQUIRCLE)
+-- 3. SHORTCUT SYSTEM (Fixed Names)
 -- ==========================================
 local shortGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 shortGui.Name = "HubShortcuts"; shortGui.ResetOnSpawn = false
 
-local function createShortcut(text, valName)
+local function createShortcut(shortName, valName)
     local sBtn = Instance.new("TextButton", shortGui)
-    sBtn.Size = UDim2.new(0, 45, 0, 45); sBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
-    sBtn.Text = text:sub(1,2); sBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); sBtn.TextColor3 = Color3.new(1, 1, 1)
-    Instance.new("UICorner", sBtn).CornerRadius = UDim.new(0, 12) -- Squircle
+    sBtn.Size = UDim2.new(0, 55, 0, 55); sBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+    sBtn.Text = shortName; sBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); sBtn.TextColor3 = Color3.new(1, 1, 1)
+    sBtn.Font = Enum.Font.GothamBold; sBtn.TextSize = 14
+    Instance.new("UICorner", sBtn).CornerRadius = UDim.new(0, 12)
     Instance.new("UIStroke", sBtn).Color = Color3.fromRGB(0, 120, 215)
 
     -- Dragging
@@ -128,7 +129,7 @@ end
 local MainTab = Window:CreateTab("Main Features", 4483362458)
 local SetTab = Window:CreateTab("Power Settings", 4483362458)
 
-local function addFeature(name, val)
+local function addFeature(name, shortName, val)
     MainTab:CreateToggle({
         Name = name,
         CurrentValue = false,
@@ -136,31 +137,32 @@ local function addFeature(name, val)
     })
     MainTab:CreateButton({
         Name = "Create Shortcut for " .. name,
-        Callback = function() createShortcut(name, val) end
+        Callback = function() createShortcut(shortName, val) end
     })
-    MainTab:CreateLabel("--------------------------------------------------") -- Boşluk/Çizgi
+    MainTab:CreateLabel("--------------------------------------------------")
 end
 
-addFeature("HD Fly (Stiff)", "Fly")
-addFeature("Noclip", "Noclip")
-addFeature("Infinite Jump", "InfJump")
-addFeature("Aimbot (Bots+Pl)", "Aimbot")
-addFeature("Player ESP", "ESP")
-addFeature("Enable Speed Hack", "SpeedH")
-addFeature("Enable Jump Hack", "JumpH")
+-- Özellikler ve onlara özel kısa isimler
+addFeature("HD Fly (Stiff)", "FLY", "Fly")
+addFeature("Noclip", "NC", "Noclip")
+addFeature("Infinite Jump", "INF", "InfJump")
+addFeature("Aimbot (Bots+Pl)", "AIM", "Aimbot")
+addFeature("Player ESP", "ESP", "ESP")
+addFeature("Enable Speed Hack", "SPD", "SpeedH")
+addFeature("Enable Jump Hack", "JMP", "JumpH")
 
 SetTab:CreateInput({
     Name = "Fly Speed",
     PlaceholderText = "Enter Number",
     Callback = function(v) _G.Settings.FlySpeed = tonumber(v) or 50 end
 })
-SetTab:CreateLabel(" ") -- Boşluk
+SetTab:CreateLabel(" ")
 SetTab:CreateInput({
     Name = "Walk Speed",
     PlaceholderText = "Enter Number",
     Callback = function(v) _G.Settings.WalkSpeed = tonumber(v) or 16 end
 })
-SetTab:CreateLabel(" ") -- Boşluk
+SetTab:CreateLabel(" ")
 SetTab:CreateInput({
     Name = "Jump Power",
     PlaceholderText = "Enter Number",
