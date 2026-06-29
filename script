@@ -10,13 +10,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 
--- Sahiplik Kontrolü
-if game.CreatorId ~= Player.UserId then 
-	print("Yetkiniz yok!")
-	script:Destroy() 
-	return 
-end
-
 -- GUI ANA YAPI
 local ScreenGui = Instance.new("ScreenGui", Player.PlayerGui)
 ScreenGui.Name = "UltimateOwnerPanel"
