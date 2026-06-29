@@ -1,20 +1,19 @@
--- [[ UNIVERSAL HUB v2 - FLUENT NATIVE ]] --
--- Integrated: Fluent Key System, Bot-Aimbot, HD Fly, Mobile Toggle
+-- [[ UNIVERSAL HUB v2 - FLUENT OFFICIAL KEY EDITION ]] --
 
+-- Fluent Kütüphanesini Yükle
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
 -- ==========================================
--- 1. WINDOW & NATIVE KEY SYSTEM
+-- 1. FLUENT WINDOW & KEY SYSTEM
 -- ==========================================
 local Window = Fluent:CreateWindow({
     Title = "Universal Hub v2",
     SubTitle = "by AI - Ultra Stable",
     TabWidth = 160,
     OptionTips = true,
-    KeySystem = true, -- FLUENT'İN KENDİ KEY SİSTEMİ AKTİF
-    KeySystemTitle = "Universal Hub v2",
-    KeySystemDescription = "Enter the key to unlock the hub",
-    Key = "woahmyuniversalscriptissoopv2" -- BURAYA KEYİ YAZDIK
+    -- FLUENT'İN KENDİ KEY SİSTEMİ
+    KeySystem = true, 
+    Key = "woahmyuniversalscriptissoopv2" 
 })
 
 -- ==========================================
@@ -26,16 +25,10 @@ ToggleGui.Name = "FluentMobileToggle"
 ToggleGui.ResetOnSpawn = false
 
 local OpenBtn = Instance.new("TextButton", ToggleGui)
-OpenBtn.Size = UDim2.new(0, 50, 0, 50)
-OpenBtn.Position = UDim2.new(0.8, 0, 0.2, 0)
-OpenBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-OpenBtn.Text = "v2"
-OpenBtn.TextColor3 = Color3.new(1, 1, 1)
-OpenBtn.Font = Enum.Font.GothamBold
+OpenBtn.Size = UDim2.new(0, 50, 0, 50); OpenBtn.Position = UDim2.new(0.8, 0, 0.2, 0)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25); OpenBtn.Text = "v2"; OpenBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", OpenBtn).CornerRadius = UDim.new(1, 0)
-local Stroke = Instance.new("UIStroke", OpenBtn)
-Stroke.Color = Color3.fromRGB(0, 120, 215)
-Stroke.Thickness = 2
+Instance.new("UIStroke", OpenBtn).Color = Color3.fromRGB(0, 120, 215)
 
 -- Mobil Sürükleme Sistemi
 local dragging, dragStart, startPos
@@ -54,12 +47,10 @@ game:GetService("UserInputService").InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
 end)
 
--- Fluent Penceresini Aç/Kapat (Sistemle Uyumlu)
+-- Fluent Penceresini Aç/Kapat
 OpenBtn.MouseButton1Click:Connect(function()
     local fluentGui = player.PlayerGui:FindFirstChild("Fluent") or game:GetService("CoreGui"):FindFirstChild("Fluent")
-    if fluentGui then
-        fluentGui.Enabled = not fluentGui.Enabled
-    end
+    if fluentGui then fluentGui.Enabled = not fluentGui.Enabled end
 end)
 
 -- ==========================================
@@ -73,7 +64,7 @@ local Settings = {
 
 local function getChar() return player.Character or player.CharacterAdded:Wait() end
 
--- Aimbot: Botlar + Oyuncular (360 & Wall Check)
+-- Bot + Oyuncu Aimbot (Wall Check)
 local function getClosestTarget()
     local closest, dist = nil, math.huge
     for _, obj in pairs(workspace:GetDescendants()) do
@@ -104,22 +95,20 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
--- Main Tab
-Tabs.Main:AddToggle("FlyToggle", {Title = "HD Fly (Sert Duruş)", Default = false, Callback = function(v) Settings.Fly = v end})
-Tabs.Main:AddToggle("NoclipToggle", {Title = "Noclip", Default = false, Callback = function(v) Settings.Noclip = v end})
-Tabs.Main:AddToggle("JumpToggle", {Title = "Infinite Jump", Default = false, Callback = function(v) Settings.InfJump = v end})
-Tabs.Main:AddToggle("AimToggle", {Title = "Aimbot 360 (Bots+Players)", Default = false, Callback = function(v) Settings.Aimbot = v end})
-Tabs.Main:AddToggle("ESPToggle", {Title = "Player ESP", Default = false, Callback = function(v) Settings.ESP = v end})
-Tabs.Main:AddToggle("SpeedToggle", {Title = "Enable Speed Hack", Default = false, Callback = function(v) Settings.SpeedH = v end})
-Tabs.Main:AddToggle("JumpToggle2", {Title = "Enable Jump Hack", Default = false, Callback = function(v) Settings.JumpH = v end})
+Tabs.Main:AddToggle("FlyT", {Title = "HD Fly (Stiff Pose)", Default = false, Callback = function(v) Settings.Fly = v end})
+Tabs.Main:AddToggle("NoclipT", {Title = "Noclip", Default = false, Callback = function(v) Settings.Noclip = v end})
+Tabs.Main:AddToggle("JumpT", {Title = "Infinite Jump", Default = false, Callback = function(v) Settings.InfJump = v end})
+Tabs.Main:AddToggle("AimT", {Title = "Aimbot (Bots+Players)", Default = false, Callback = function(v) Settings.Aimbot = v end})
+Tabs.Main:AddToggle("ESPT", {Title = "Player ESP", Default = false, Callback = function(v) Settings.ESP = v end})
+Tabs.Main:AddToggle("SpeedT", {Title = "Enable Speed Hack", Default = false, Callback = function(v) Settings.SpeedH = v end})
+Tabs.Main:AddToggle("JumpT2", {Title = "Enable Jump Hack", Default = false, Callback = function(v) Settings.JumpH = v end})
 
--- Settings Tab
 Tabs.Settings:AddSlider("FlyS", {Title = "Fly Speed", Default = 50, Min = 10, Max = 300, Rounding = 1, Callback = function(v) Settings.FlySpeed = v end})
 Tabs.Settings:AddSlider("WalkS", {Title = "Walk Speed", Default = 50, Min = 16, Max = 500, Rounding = 1, Callback = function(v) Settings.WalkSpeed = v end})
 Tabs.Settings:AddSlider("JumpS", {Title = "Jump Power", Default = 100, Min = 50, Max = 1000, Rounding = 1, Callback = function(v) Settings.JumpPower = v end})
 
 -- ==========================================
--- 5. ENGINE (Donma Karşıtı Kalp Atışı)
+-- 5. THE ENGINE (Asynchronous Heartbeat)
 -- ==========================================
 task.spawn(function()
     game:GetService("RunService").Heartbeat:Connect(function()
@@ -175,6 +164,7 @@ task.spawn(function()
     end
 end)
 
+-- Inf Jump
 game:GetService("UserInputService").JumpRequest:Connect(function()
     pcall(function() if Settings.InfJump then getChar():FindFirstChildOfClass("Humanoid"):ChangeState("Jumping") end end)
 end)
