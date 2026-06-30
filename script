@@ -50,7 +50,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "Universal Hub v2", 
     LoadingTitle = "Loading Hub...", 
-    LoadingSubtitle = "by AI", 
+    LoadingSubtitle = "by ErdemPro655 in YT", 
     ConfigurationSaving = { Enabled = true, Folder = "UniversalHubV2" }
 })
 
